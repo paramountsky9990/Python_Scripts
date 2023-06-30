@@ -1,7 +1,7 @@
 import os
 
-start_num = int(input("Enter start number: "))
-end_num = int(input("Enter end number: "))
+start_num = int(input("Enter start number:"))
+end_num = int(input("Enter end number:"))
 
 def create_folders(start_num, end_num, directory):
     """
