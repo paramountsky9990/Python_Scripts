@@ -1,7 +1,7 @@
 import random
 
-number_a = int(input("Enter first number: "))
-number_b = int(input("Enter second number: "))
+number_a = int(input("Enter first number:"))
+number_b = int(input("Enter second number:"))
 
 
 def generate_random_numbers(count):
