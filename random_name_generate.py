@@ -4,7 +4,7 @@ import os
 
 # Set up your OpenAI API credentials
 # GPT-3.5
-openai.api_key = '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'
+openai.api_key = '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'
 # GPT-4
 # openai.api_key = os.getenv('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')
 
