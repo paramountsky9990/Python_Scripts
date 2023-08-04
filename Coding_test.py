@@ -55,7 +55,8 @@ class Ui_MainWindow(object):
         self.pushButton_4 = QtWidgets.QPushButton(self.AI)
         self.pushButton_4.setGeometry(QtCore.QRect(550, 280, 100, 31))
         self.pushButton_4.setObjectName("pushButton_4")
-        self.pushButton_4.clicked.connect(self.evaluate)
+        # self.pushButton_4.clicked.connect(self.evaluate)
+        self.pushButton_4.clicked.connect(self.calculate_overall_score_sum)
         self.tabWidget.addTab(self.AI, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -77,55 +78,16 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(_translate("MainWindow", "Evaluate"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.AI), _translate("MainWindow", "AI"))
     
-    # def get_bid_search(self):
-    #     bid_dirs = pathlib.Path("Bid")
-    #     bid_file_list = [str(item).replace("\\","/") for item in bid_dirs.iterdir() if item.is_file()]
-    #     # print(bid_file_list)
-    #     match_num_list = [0 for item in bid_file_list]        
-    #     search_cat_list = self.lineEdit.text().split(",")
-    #     print(search_cat_list)         
-    #     match_num_max = 0             
-    #     for i, filename in enumerate(sorted(os.listdir(bid_dir), reverse=True)):
-    #         # print(filename)
-    #         for search_item in search_cat_list:
-    #             match_num_list[i] = match_num_list[i] + filename.count(search_item)
-    #         if match_num_max < match_num_list[i]:
-    #             match_num_max = match_num_list[i]
-    #             search_result = filename        
-    #     print(f"search_result is {search_result}")
-    #     return search_result
-
-    # def search_bid(self):
-    #     # print(self.lineEdit.text())
-    #     bid_search = self.get_bid_search()        
-    #     print(bid_search)       
-        
-    #     bid_search = bid_dir + bid_search        
-    #     print(bid_search)
-    #     f = QFile(bid_search)
-    #     if not f.exists():
-    #         print("Unable to load stylesheet, file not found in resources")
-    #         return ""
-    #     else:
-    #         f.open(QFile.ReadOnly | QFile.Text)
-    #         ts = QTextStream(f)
-    #         ts.setCodec('UTF-8')
-    #         evaluation_answer = ts.readAll()
-    #         # print(f"Bid content is {stylesheet}")
-    #         self.textEdit.setText(evaluation_answer)
-    #         f.close()
-
-    def calculate_overall_score_sum(self, overall_score):
-        global overall_score_sum, num_times
-        if num_times < max_times:
-            overall_score_sum += overall_score
-            num_times += 1
-        if num_times == max_times:
-            print("Average: ", overall_score_sum/max_times)
-            final = round(overall_score_sum/max_times,2)
-            self.lineEdit_2.setText(str(final))
-            num_times = 0
-            overall_score_sum = 0
+    def calculate_overall_score_sum(self):
+        num_times = overall_score_sum = 0
+        while num_times < max_times:
+            if num_times < max_times:
+                overall_score_sum += self.evaluate()
+                num_times += 1
+            if num_times == max_times:
+                print("Average: ", overall_score_sum/max_times)
+                final = round(overall_score_sum/max_times,2)
+                self.lineEdit_2.setText(str(final))
 
         return overall_score_sum
         
@@ -139,10 +101,14 @@ class Ui_MainWindow(object):
         4. Performance Optimization
         5. Algorithmic Efficiency
 
-        Allocate 10 (or 100%) points to each evaluation index. The total score should be calculated as the average of all individual scores.
-        Please assess the code and provide only one overall score, considering all the evaluation indicators mentioned above. Ensure to maintain consistency in the evaluation process.
-        Once you have completed the evaluation, submit the overall score and every evaluation point scores as your response. Don't mention the explanation.
+        Allocate 10 points to each evaluation index (or 100% maximum score for each index). The total score should be calculated as the average of all individual scores. 
+        The overall score and each evaluation index should be presented as a float or integer without using any percentage or division notation.
+        i.e., Don't use a/b or x% format for overall score and each evaluation index type.
+
+        Please assess the code and provide an overall score, considering all the evaluation indicators mentioned above. Ensure to maintain consistency in the evaluation process. 
+        Don't mention the explanation.
         Always proceed as this prompt.'''
+        # Once you have completed the evaluation, submit the overall score and each evaluation point score as your response.
         prompt = prompt + f"Coding problem is as follows: {keyword}."
 
         # print(prompt)
@@ -157,22 +123,29 @@ class Ui_MainWindow(object):
         self.textEdit_3.setText(evaluation_answer)
 
         # Extract the overall score from the AI's response using regular expressions
-        overall_score_match = re.search(r"Overall Score: (\d+\.\d+)", evaluation_answer)
+        # overall_score_match = re.search(r"Overall Score: (\d+\.\d+)", evaluation_answer)
+
+        pattern = r"Overall Score: (\d+(\.\d+)?)"
+        overall_score_match = re.search(pattern, evaluation_answer)
+        # overall_score_match = re.search(r"Overall Score: (\d+(\.\d*)?|\.\d+)", evaluation_answer)
         print(overall_score_match)
+        overall_score = 0
         if overall_score_match:
             overall_score = float(overall_score_match.group(1))
-            self.calculate_overall_score_sum(overall_score)
-            
+            # self.calculate_overall_score_sum(overall_score)
+        
+        return overall_score           
 
-overall_score_sum = 0
-max_times = 3 
-num_times = 0
+
+max_times = 10 
 
 if __name__ == "__main__":
     import sys
 
     # Set the OpenAI API key
-    openai.api_key = "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"
+    openai.api_key = "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"
+    # openai.api_key = "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"
+
 
     # bid_dir = "Bid/"
 
