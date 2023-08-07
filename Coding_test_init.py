@@ -9,10 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QFile, QDir
+from PyQt5.QtCore import QTextStream
 import openai
+import pathlib
+import os
 import re
-
-final = 0
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -82,9 +84,8 @@ class Ui_MainWindow(object):
             if num_times < max_times:
                 overall_score_sum += self.evaluate()
                 num_times += 1
-                final = overall_score_sum/num_times
             if num_times == max_times:
-                # print("Average: ", overall_score_sum/max_times)
+                print("Average: ", overall_score_sum/max_times)
                 final = round(overall_score_sum/max_times,2)
                 self.lineEdit_2.setText(str(final))
 
@@ -104,21 +105,10 @@ class Ui_MainWindow(object):
         The overall score and each evaluation index should be presented as a float or integer without using any percentage or division notation.
         i.e., Don't use a/b or x% format for overall score and each evaluation index type.
 
-        Please assess the code and provide an overall score, considering all the evaluation indicators mentioned above. Ensure to maintain consistency in the evaluation process. Once you have completed the evaluation, submit the overall score and each evaluation point score as your response.
+        Please assess the code and provide an overall score, considering all the evaluation indicators mentioned above. Ensure to maintain consistency in the evaluation process. 
         Don't mention the explanation.
-        Always proceed as this prompt.
-        Return using this template:
-        "1. Correctness (Warnings, Errors) : [score]
-        2. Efficiency : [score]
-        3. Code Quality : [score]
-        4. Performance Optimization : [score]
-        5. Algorithmic Efficiency : [score]
-
-        Overall Score : [average of scores]"
-
-        Note: Scores must be FLOAT or INTEGER!
-        Overall Score must be RETURNED!
-        '''
+        Always proceed as this prompt.'''
+        # Once you have completed the evaluation, submit the overall score and each evaluation point score as your response.
         prompt = prompt + f"Coding problem is as follows: {keyword}."
 
         # print(prompt)
@@ -134,16 +124,16 @@ class Ui_MainWindow(object):
 
         # Extract the overall score from the AI's response using regular expressions
         # overall_score_match = re.search(r"Overall Score: (\d+\.\d+)", evaluation_answer)
-        
-        overall_score_match = evaluation_answer.split('Overall Score : ')
-        print(evaluation_answer)
+
+        pattern = r"Overall Score: (\d+(\.\d+)?)"
+        overall_score_match = re.search(pattern, evaluation_answer)
+        # overall_score_match = re.search(r"Overall Score: (\d+(\.\d*)?|\.\d+)", evaluation_answer)
+        print(overall_score_match)
         overall_score = 0
-        if len(overall_score_match)>1:
-            overall_score = float(overall_score_match[1])
-        else:
-            overall_score = final
+        if overall_score_match:
+            overall_score = float(overall_score_match.group(1))
             # self.calculate_overall_score_sum(overall_score)
-        # print(overall_score)
+        
         return overall_score           
 
 
